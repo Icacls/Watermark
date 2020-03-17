@@ -1,6 +1,6 @@
 {
-  "name": "@tyx1703/watermark",
-  "version": "1.1.0",
+  "name": "page-watermark",
+  "version": "1.0.0",
   "description": "Watermark is a simple and quick library to draw watermark on HTML element.",
   "main": "dist/Watermark.min.js",
   "license": "MIT",
