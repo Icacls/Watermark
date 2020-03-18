@@ -1,74 +1,51 @@
 # Watermark
 
-![npm](https://img.shields.io/npm/v/@tyx1703/watermark)
 
 # Introduction
 
-Watermark is a simple and quick library to draw watermark on HTML element.
+简单的页面水印工具，默认挂载到document.body上
 
 ```javascript
-new Watermark().set({
-  // some options
-}).mount('body').draw().destory();
+new Watermark().set('').draw().destory();
 ```
 
 ```javascript
-new Watermark('body', {
-  textArray: ['Hello, world!'],
-  rotate: Math.PI / 6,
-  color: #aaa
-}).draw();
+const watermark = new Watermark({name: '罗海', id: '10001'}).draw();
 ```
 
-# Get Started
+# 开始使用
 
-## Installatin
+## 安装
 
 ```console
-yarn add page-watermark
+npm install page-watermark --registry http://192.168.13.184:4873 --save
 ```
 
 ## API
 
 ### constructor([el][, options])
-- *Arguments:*
+- *参数:*
     ```
-      el {String | HTMLElement}['']       selector or html element
-      options {Object} [{...}]             options for watermark
-        textArray {Array} [['example']]   text list to display`
-        fontSize {Number} [26]            font size`
-        fontFamily {String} ['serif']     font family`
-        padding {Number} [25]             watermark wrapper padding with text`
-        lineHeight {Number} [-1]          text line height`
-        rotate {Number} [0]               the angle of rotate, must in range of (-PI/2, PI/2)
-        fontScale {Number} [0.5]          Half-width and full-width fonts width ratio
-        color {String} ['#eeeeee']        text color
-        auto {Boolean} [true]             whether add background to mounted element automatically
-        observe {Boolean} [true]          whether observe background of mounted element
+      employee {Object} [{...}]      雇员信息
+        id     {Number} [10001]      工号
+        name   {String} ['test001']    姓名
     ```
-- *Example:*
+- *实例:*
     - ```javascript
       new Watermark();
       ```
     - ``` javascript
-      new Watermark('body', {
-        textArray: [
-          'example',
-          '你好，欢迎使用',
-          'Hello, 世界'
-        ],
-        fontSize: 16,
-      });
+      new Watermark({name: 'test001', id: '10001'});
       ```
-- *Note:*
-    If you set `options.auto = false`, `Watermark` will never add background to the mounted element, you must do it manually.
-    for example: 
+- *注意:*
+   
+    示例代码: 
     ```javascript
 
       /*
        * use api
        */
-      const watermark = new Watermark('body', { auto: false });
+      const watermark = new Watermark();
       // ... do some action
       watermark.draw();
       // you can access canvas by watermark.canvas properity
@@ -79,9 +56,7 @@ yarn add page-watermark
       /*
        * use pure js
        */
-      const watermark = new Watermark('body', {
-        auto: false,
-      });
+      const watermark = new Watermark();
       watermark.draw();
       const canvas = watermark.draw().canvas;
       const dataUrl = canvas.toDataURL();
@@ -89,97 +64,73 @@ yarn add page-watermark
       body.style.background = `url(${dataUrl})`;
     ```
 
-### mount(el)
+### mount()
 
-- *Arguments:*
-    - `el {String | HTMLElement} selector or html element`
-- *Usage:*
+- *使用:*
     
-    If a watermark instance not mount any element when is was created, you can use `mount` function to mount a element for it.
+   挂载水印到页面上
 
-- *Example:*
+- *示例代码:*
     - ```javascript
-      const watermark = new Watermark({
-        color: '#cccccc'
-      }); // create a instance of Watermark
-      watermark.mount('body');  // mount to document.body
+      const watermark = new Watermark(); // create a instance of Watermark
+      watermark.mount();  // mount to document.body
       // watermark.draw();  // dont fotget to use draw() to display watermark on mounted element
       ```
+
 ### set(options)
 
 - *Arguments:*
-    - `options {Object}[{...}] options for watermark`
+    ```
+      employee {Object} [{...}]      雇员信息
+        id     {Number} [10001]      工号
+        name   {String} ['test001']    姓名
+    ```
 
-- *Usage:*
+- *使用:*
 
     It's default value is same as `constructor`
     You can use `set` function to re-configurate watermark style
 
-- *Example:*
+- *示例代码:*
     - ```javascript
-        const watermark = new Watermark('body', {
-          // your options
-        });
+        const watermark = new Watermark();
         // if you want to re-configurate
         watermark.set({
-          // your new options
+          id: '10001'
+          name: 'test001', 
         });
         // watermark.draw();  must use draw() to display
       ```
 
 ### draw()
 
-- *Usage:*
+- *使用:*
 
     use this function to render watermark on the mounted element.
 
-- *Example:*
+- *示例代码:*
     - ```javascript
-      new Watermark('body').draw();
+      new Watermark().draw();
       ```
     - ```javascript
       new Watermark().set().mount().draw();
       ```
     - ```javascript
-      new Watermark('body').set().draw();
+      new Watermark().set().draw();
       ```
       
 ### destory()
 
-- *Usage:*
+- *使用:*
 
     - unmount element
     - disconnect mutation observer
     - change options to default value
 
-- *Example:*
+- *示例代码:*
     - ```javascript
       new Watermark().set().mount().destory();
       ```
 
-### render()
-- *Usage:*
-
-    - add background to mounted element
-
-- *Note:*
-    
-    - only used in situation that `options.auto` is setted to `false`
-
-### observer()
-  - *Usage:*
-
-    - add observer that can observe background of mounted element
-
-- *Note:*
-    
-    - only used in situation that `options.observe` is setted to `false`
 
 
-## Contributors
-
-If you are interested in this project, welcome to fork and pull request.
-
-## License
-
-MIT License

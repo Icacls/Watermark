@@ -46,7 +46,7 @@
 		var set = document.querySelector('#set');
 		var destory = document.querySelector('#destory');
 		
-		var watermark = new Watermark('body').draw();
+		var watermark = new Watermark('HRM系统/工号0001/罗海').draw();
 		create.addEventListener('click', function() {
 			if(watermark) {
 				watermark.destory();	
@@ -61,13 +61,10 @@
 
 		set.addEventListener('click', function() {
 			if(watermark)
-				watermark.set({
-					color: randomColor(),
-					textArray: randomTextArray(),
-					rotate: randomRotate(),
-					opacity: 0.5,
-					fontFamily: 'Montserrat',
-				}).draw();
+				watermark.set({name: '罗海', id: '10001'}).draw();
+			
+				console.log('watemark----->', watermark);
+				
 		});
 		
 		destory.addEventListener('click', function() {
@@ -76,40 +73,6 @@
 			watermark = null;
 		});
 
-		function randomInt(min, max) {
-			min = Math.floor(min);
-			max = Math.floor(max);
-			return Math.floor(Math.random() * (max - min) + min);
-		}
-
-		function randomColor() {
-			var colorMap = ['#cde4ff', '#f6f8fa', '#a1c2fa', '#ea4335'];
-			h = randomInt(0, colorMap.length);
-			return colorMap[h];
-		}
-
-		function randomTextArray() {
-			var textMap = [
-				'Hello, world!',
-				'世界你好！',
-				"i can eat glass and it doesn't hurt me",
-				'a lazy fox jumps over a dog'
-			];
-			var textArray = [];
-
-			var h = randomInt(1, textMap.length);
-			for (var i = 0; i < h; i++) {
-				var tmp = randomInt(0, textMap.length -1);
-				textArray.push(textMap[tmp]);
-			}
-			return textArray;
-		}
-
-		function randomRotate() {
-			var h = randomInt(3, 10);
-			var symbol = randomInt(0, 2) ? 1 : -1;
-			return (symbol * Math.PI / h);
-		}
 	</script>
 </body>
 </html>

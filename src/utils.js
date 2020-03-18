@@ -40,9 +40,21 @@ const length = (string, scale) => {
   return l;
 };
 
+const getNowFormatDate = () => {
+  const char = '';
+  const nowDate = new Date();
+  const day = nowDate.getDate();
+  const month = nowDate.getMonth() + 1; // 注意月份需要+1
+  const year = nowDate.getFullYear();
+  // 补全0，并拼接
+  const currentdate = year + char + (month < 10 ? '0' + month : month) + char + (day < 10 ? '0' + day : day);
+  return currentdate;
+};
+
 export default {
   isNode,
   isString,
   isNull,
   length,
+  getNowFormatDate
 };

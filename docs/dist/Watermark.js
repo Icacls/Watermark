@@ -156,27 +156,26 @@ var utils_length = function length(string, scale) {
   return l;
 };
 
+var getNowFormatDate = function getNowFormatDate() {
+  var char = '';
+  var nowDate = new Date();
+  var day = nowDate.getDate();
+  var month = nowDate.getMonth() + 1; // 注意月份需要+1
+
+  var year = nowDate.getFullYear(); // 补全0，并拼接
+
+  var currentdate = year + char + (month < 10 ? '0' + month : month) + char + (day < 10 ? '0' + day : day);
+  return currentdate;
+};
+
 /* harmony default export */ var utils = ({
   isNode: isNode,
   isString: isString,
   isNull: isNull,
-  length: utils_length
+  length: utils_length,
+  getNowFormatDate: getNowFormatDate
 });
 // CONCATENATED MODULE: ./src/Watermark.js
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -188,22 +187,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var Watermark_Watermark =
 /*#__PURE__*/
 function () {
-  function Watermark(el, options) {
+  function Watermark(employee) {
     _classCallCheck(this, Watermark);
 
-    if (options === undefined) {
-      if (utils.isNode(el) || utils.isString(el)) {
-        this.mount(el);
-        this.set();
-      } else {
-        this.$el = null;
-        this.set(el);
-      }
+    if (employee === undefined) {
+      this.set();
     } else {
-      this.mount(el);
-      this.set(options);
+      this.set(employee);
     }
 
+    this.mount();
     this.canvas = null;
     this.background = '';
   }
@@ -240,14 +233,7 @@ function () {
   }, {
     key: "mount",
     value: function mount() {
-      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      if (typeof el === 'string') {
-        this.$el = document.querySelector(el);
-      } else {
-        this.$el = el;
-      }
-
+      this.$el = document.querySelector('body');
       return this;
     }
     /**
@@ -269,20 +255,23 @@ function () {
   }, {
     key: "set",
     value: function set() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var employee = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       // eslint-disable-next-line no-param-reassign
-      options = _objectSpread({
+      var dateStr = utils.getNowFormatDate();
+      var mark = "ID: ".concat(employee.id || '100034', "/").concat(employee.name || 'Example', "/").concat(dateStr);
+      var options = {
         textArray: ['example'],
-        fontSize: 26,
+        textInfo: mark,
+        fontSize: 15,
         fontFamily: 'serif',
         padding: 25,
         lineHeight: -1,
-        rotate: 0,
-        fontScale: 0.5,
-        color: '#eeeeee',
+        rotate: 25,
+        fontScale: 1,
+        color: 'rgba(0, 0, 0, 0.2)',
         auto: true,
         observe: true
-      }, options);
+      };
       this.options = options;
       return this;
     }
@@ -308,7 +297,7 @@ function () {
       this.options.font = "".concat(options.fontSize, "px ").concat(options.fontFamily);
 
       if (options.lineHeight === -1) {
-        this.options.lineHeight = 1.25 * options.fontSize;
+        this.options.lineHeight = 2.5 * options.fontSize;
       }
     }
     /**
@@ -320,13 +309,15 @@ function () {
     value: function initSize() {
       var options = this.options; // max length of text array
 
-      var maxLength = options.textArray.reduce(function (max, current) {
-        var currentLength = utils.length(current, options.fontScale);
+      /* const maxLength = options.textArray.reduce((max, current) => {
+        const currentLength = U.length(current, options.fontScale);
         return currentLength > max ? currentLength : max;
-      }, 0); // 内容宽高
+      }, 0); */
+
+      var maxLength = utils.length(options.textInfo, options.fontScale); // 内容宽高
 
       var W = maxLength * options.fontSize + options.padding * 2;
-      var H = options.textArray.length * options.lineHeight + options.padding * 2;
+      var H = options.lineHeight + options.padding * 2;
       var a = Math.abs(options.rotate); // 角度
       // 画布宽高context width => cW, context height => cH
 
@@ -334,8 +325,8 @@ function () {
       var ctxH = H * Math.cos(a) + W * Math.sin(a);
       this.contentWidth = W;
       this.contentHeight = H;
-      this.ctxWidth = Math.floor(ctxW);
-      this.ctxHeight = Math.floor(ctxH);
+      this.ctxWidth = 300 || false;
+      this.ctxHeight = 300 || false;
     }
   }, {
     key: "drawCanvas",
@@ -346,11 +337,12 @@ function () {
 
       if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
-        var options = this.options;
-        ctx.translate.apply(ctx, _toConsumableArray(this.origin(options.rotate)));
-        ctx.rotate(options.rotate);
-        ctx.textAlign = 'start';
-        ctx.textBaseline = 'top';
+        var options = this.options; // ctx.translate(...this.origin(options.rotate));
+        // ctx.rotate(options.rotate);
+
+        ctx.rotate(-30 * Math.PI / 180);
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'Middle';
         ctx.font = options.font;
         ctx.fillStyle = options.color;
         var H = this.contentHeight; // 内容高度
@@ -373,12 +365,16 @@ function () {
 
         var halfPI = Math.PI / 2;
         var tmp = (halfPI + options.rotate) % halfPI;
-        var offsetY = -H * Math.sin(tmp) * Math.sin(tmp);
-        options.textArray.forEach(function (text, i) {
-          var x = offsetX + options.padding;
-          var y = i * options.lineHeight + offsetY + options.padding;
+        var offsetY = H * Math.sin(tmp) * Math.sin(tmp);
+        /* options.textArray.forEach((text, i) => {
+          const x = offsetX + options.padding;
+          const y = i * options.lineHeight + offsetY + options.padding;
           ctx.fillText(text, x, y);
-        });
+        }); */
+
+        var x = offsetX + options.padding;
+        var y = options.lineHeight + offsetY + options.padding;
+        ctx.fillText(options.textInfo, x, y);
         this.canvas = canvas;
       }
     }

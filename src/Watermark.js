@@ -1,19 +1,13 @@
 import U from './utils';
 
 class Watermark {
-  constructor(el, options) {
-    if (options === undefined) {
-      if (U.isNode(el) || U.isString(el)) {
-        this.mount(el);
-        this.set();
-      } else {
-        this.$el = null;
-        this.set(el);
-      }
+  constructor(employee) {
+    if (employee === undefined) {
+      this.set();
     } else {
-      this.mount(el);
-      this.set(options);
+      this.set(employee);
     }
+    this.mount();
     this.canvas = null;
     this.background = '';
   }
@@ -42,12 +36,8 @@ class Watermark {
    * @param {String | HTMLElement} el
    * @return this
    */
-  mount(el = null) {
-    if (typeof el === 'string') {
-      this.$el = document.querySelector(el);
-    } else {
-      this.$el = el;
-    }
+  mount() {
+    this.$el = document.querySelector('body');
     return this;
   }
 
@@ -64,20 +54,22 @@ class Watermark {
    * @param {Object} options
    * @return this
    */
-  set(options = {}) {
+  set(employee = {}) {
     // eslint-disable-next-line no-param-reassign
-    options = {
+    const dateStr = U.getNowFormatDate();
+    const mark = `ID: ${employee.id || '100034'}/${employee.name || 'Example'}/${dateStr}`;
+    const options = {
       textArray: ['example'],
-      fontSize: 26,
+      textInfo: mark,
+      fontSize: 15,
       fontFamily: 'serif',
       padding: 25,
       lineHeight: -1,
-      rotate: 0,
-      fontScale: 0.5,
-      color: '#eeeeee',
+      rotate: 25,
+      fontScale: 1,
+      color: 'rgba(0, 0, 0, 0.2)',
       auto: true,
       observe: true,
-      ...options,
     };
     this.options = options;
     return this;
@@ -99,7 +91,7 @@ class Watermark {
     this.options.font = `${options.fontSize}px ${options.fontFamily}`;
 
     if (options.lineHeight === -1) {
-      this.options.lineHeight = 1.25 * options.fontSize;
+      this.options.lineHeight = 2.5 * options.fontSize;
     }
   }
 
@@ -110,14 +102,15 @@ class Watermark {
     const { options } = this;
 
     // max length of text array
-    const maxLength = options.textArray.reduce((max, current) => {
+    /* const maxLength = options.textArray.reduce((max, current) => {
       const currentLength = U.length(current, options.fontScale);
       return currentLength > max ? currentLength : max;
-    }, 0);
+    }, 0); */
 
+    const maxLength = U.length(options.textInfo, options.fontScale);
     // 内容宽高
     const W = maxLength * options.fontSize + options.padding * 2;
-    const H = options.textArray.length * options.lineHeight + options.padding * 2;
+    const H = options.lineHeight + options.padding * 2;
 
     const a = Math.abs(options.rotate); // 角度
     // 画布宽高context width => cW, context height => cH
@@ -126,8 +119,8 @@ class Watermark {
 
     this.contentWidth = W;
     this.contentHeight = H;
-    this.ctxWidth = Math.floor(ctxW);
-    this.ctxHeight = Math.floor(ctxH);
+    this.ctxWidth = 300 || Math.abs(Math.floor(ctxW)) + 150;
+    this.ctxHeight = 300 || Math.floor(ctxH) + 80;
   }
 
   drawCanvas() {
@@ -137,10 +130,11 @@ class Watermark {
     if (canvas.getContext) {
       const ctx = canvas.getContext('2d');
       const { options } = this;
-      ctx.translate(...this.origin(options.rotate));
-      ctx.rotate(options.rotate);
-      ctx.textAlign = 'start';
-      ctx.textBaseline = 'top';
+      // ctx.translate(...this.origin(options.rotate));
+      // ctx.rotate(options.rotate);
+      ctx.rotate(-30 * Math.PI / 180);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'Middle';
       ctx.font = options.font;
       ctx.fillStyle = options.color;
       const H = this.contentHeight; // 内容高度
@@ -161,12 +155,16 @@ class Watermark {
        */
       const halfPI = Math.PI / 2;
       const tmp = (halfPI + options.rotate) % halfPI;
-      const offsetY = -H * Math.sin(tmp) * Math.sin(tmp);
-      options.textArray.forEach((text, i) => {
+      const offsetY = H * Math.sin(tmp) * Math.sin(tmp);
+      /* options.textArray.forEach((text, i) => {
         const x = offsetX + options.padding;
         const y = i * options.lineHeight + offsetY + options.padding;
         ctx.fillText(text, x, y);
-      });
+      }); */
+
+      const x = offsetX + options.padding;
+      const y = options.lineHeight + offsetY + options.padding;
+      ctx.fillText(options.textInfo, x, y);
       this.canvas = canvas;
     }
   }

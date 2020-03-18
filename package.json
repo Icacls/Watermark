@@ -1,6 +1,6 @@
 {
   "name": "page-watermark",
-  "version": "1.0.0",
+  "version": "1.0.8",
   "description": "Watermark is a simple and quick library to draw watermark on HTML element.",
   "main": "dist/Watermark.min.js",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "type": "git",
     "url": "https://github.com/YanxinTang/Watermark.git"
   },
-  "author": "tyx1703",
+  "author": "winicafe",
   "devDependencies": {
     "@babel/core": "^7.7.7",
     "@babel/preset-env": "^7.6.3",
